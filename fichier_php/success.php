@@ -1,15 +1,47 @@
 <?php
-// Initialiser la session si nécessaire
-session_start();
+session_start(); // Toujours au tout début
+
+date_default_timezone_set("africa/abidjan");
+
+// Inclure le fichier de connexion après le démarrage de la session
+include "connexion.php";
 
 // Récupérer les paramètres de l'URL
 $session_id = isset($_GET['session_id']) ? $_GET['session_id'] : '';
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 
-// Vous pouvez vérifier le statut du paiement en interrogeant l'API Wave si nécessaire
-// avec le session_id
+// Validation et filtrage des entrées
+$montant = filter_var($_SESSION["montant"], FILTER_SANITIZE_NUMBER_INT);
+$mobilephone = filter_var($_SESSION['mobilephone'], FILTER_SANITIZE_NUMBER_INT);
+$methode = htmlspecialchars($_SESSION['methode']);
 
-// Enregistrer le paiement dans votre base de données ici
+// echo "Montant : " . $montant . "<br>";
+// echo "Mobilephone : " . $mobilephone . "<br>";
+
+// Vérifier si les valeurs sont valides (pas false)
+if($montant !== false && $mobilephone !== false){
+    
+    $dates = date("Y-m-d H:i:s");
+
+    try {
+        $insertion = $conn->prepare("INSERT INTO paie (numero, montant, type_paiement, dates) VALUES (:numero, :montant, :type_paiement, :dates)");
+        $insertion->bindParam(':numero', $mobilephone);
+        $insertion->bindParam(':montant', $montant);
+        $insertion->bindParam(':type_paiement', $methode);
+        $insertion->bindParam(':dates', $dates);
+        
+        if ($insertion->execute()) {
+            echo "Insertion réussie!";
+        } else {
+            echo "Échec de l'insertion.";
+        }
+    } catch(PDOException $e) {
+        echo "Erreur lors de l'insertion: " . $e->getMessage();
+    }
+
+} else {
+    echo "Données invalides";
+}
 
 ?>
 <!DOCTYPE html>
@@ -37,7 +69,7 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
         
         <div class="row g-3 mt-4">
             <div class="col-12">
-                <a href="index.html" class="btn btn-pay w-100">Retour à l'accueil</a>
+                <a href="../index.php" class="btn btn-pay w-100">Retour à l'accueil</a>
             </div>
         </div>
     </div>
