@@ -1,12 +1,22 @@
 <?php
+session_start();
+
 // Vérifier si la requête est de type POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer et valider le montant
     $montant = isset($_POST['montant']) ? filter_var($_POST['montant'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : 0;
     $numero = isset($_POST['numero']) ? filter_var($_POST['numero'], FILTER_SANITIZE_NUMBER_INT) : '';
 
+    $string = pathinfo($_SERVER["PHP_SELF"], PATHINFO_FILENAME);
+    $string = preg_replace("/_/", " ", $string);
+
+    $_SESSION['mobilephone'] = $numero;
+    $_SESSION['montant'] = $montant;
+    $_SESSION["methode"] = $string;
+
     echo $numero."</br>";
     echo $montant;
+    echo $string;
     
     // Vérifier que le montant est valide
     if ($montant <= 0) {
@@ -17,8 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($numero) !== 10) {
         die(json_encode(['success' => false, 'message' => 'Numéro de téléphone invalide : ' . $numero]));
     }
+
+    // echo "<pre>";
+    // var_dump($_POST);
+    // echo "</pre>";
+
+    header("location: success.php");
     
-    // Configuration de l'API Wave (remplacez avec vos identifiants réels)
+    // // Configuration de l'API Wave (remplacez avec vos identifiants réels)
     $api_key = "wave_sn_prod_YhUNb9d...i4bA6"; // Remplacez par votre clé API complète
     
     // URL de base de votre site
@@ -74,9 +90,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             die(json_encode(['success' => false, 'message' => "Erreur: " . ($result['message'] ?? 'Erreur inconnue')]));
         }
     }
+
+
 } else {
     // Si la page est accédée directement sans données POST
     header('Location: index.html');
     exit;
 }
+
 ?>
