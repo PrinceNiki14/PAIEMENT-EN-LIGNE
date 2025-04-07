@@ -4,13 +4,20 @@ $user = "root";
 $pass = "";
 $dbname = "paiement";
 
-$conn = mysqli_connect($host, $user, $pass, $dbname);
+try {
 
-if (!$conn) {
-    die("Échec de connexion : " . mysqli_connect_error());
+    // Création de la connexion PDO
+    $conn = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
+    
+    // Configuration pour afficher les erreurs PDO
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // echo "Connexion réussie";
+
+} catch(PDOException $e) {
+
+    echo "Erreur de connexion: " . $e->getMessage();
+
 }
-echo "Connexion réussie";
-
-
 
 ?>
