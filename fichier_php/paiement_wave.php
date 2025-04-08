@@ -14,9 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['montant'] = $montant;
     $_SESSION["methode"] = $string;
 
-    echo $numero."</br>";
-    echo $montant;
-    echo $string;
+    //echo $numero."</br>";
+    //echo $montant;
+    //echo $string;
     
     // Vérifier que le montant est valide
     if ($montant <= 0) {
